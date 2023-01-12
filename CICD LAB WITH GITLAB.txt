@@ -1,0 +1,32 @@
+Build CICD lab to test, build and deploy python-app
+Followed this training
+https://www.youtube.com/watch?v=qP8kir2GUgo&ab_channel=TechWorldwithNana 
+
+The original Python app on Github https://github.com/benc-uk/python-demoapp
+-----------------------------------------------------
+
+	1- Clone the app from github to gitlab
+	2- Create a new file named .gitlab-ci.yml
+
+
+variables:
+    Image_name: hishamalamri/demo-app
+    Image_Tag: python-app-1.0
+run_tests:
+    image: python:3.9-slim-buster
+    before_script:
+        - apt-get update && apt-get install make
+    script:
+        - make test
+build_image:
+    image: docker:23.0.0-rc.1-cli
+    services:
+        - docker:23.0.0-rc.1-dind
+    variables:
+            docker_TLS_certdir: "/certs"
+    before_script:
+        - docker login -u $docker_username -p $docker_password
+    script:
+        - docker build -t $Image_name:$Image_Tag .
+        - docker push $Image_name:$Image_Tag
+
